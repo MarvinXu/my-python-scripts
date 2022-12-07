@@ -17,7 +17,9 @@ requires = ["poetry-core"]
 build-backend = "poetry.core.masonry.api"
 
 [tool.poetry.scripts]
-start = "my_python_scripts.selenium:run"
+start = "my_python_scripts.__main__:run"
+selenium = "my_python_scripts.selenium:run"
+4k = "my_python_scripts.4ksj_selenium:run"
 
 [[tool.poetry.source]]
 name = "tsinghua"

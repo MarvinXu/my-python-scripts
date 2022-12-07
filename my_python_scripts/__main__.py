@@ -1,4 +1,5 @@
 def run():
     print("Hello World!")
 
-run()
+if __name__ == '__main__':
+    run()

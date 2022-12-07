@@ -1,3 +1,5 @@
+import os
+from datetime import datetime
 from time import sleep
 
 from selenium import webdriver
@@ -6,6 +8,12 @@ from selenium.webdriver.common.by import By
 from selenium.webdriver.common.keys import Keys
 from selenium.webdriver.support.wait import WebDriverWait
 
+
+def screenshot(driver):
+    path = 'downloads'
+    if not os.path.exists(path):
+        os.makedirs(path)
+    driver.save_screenshot(f'{path}/{datetime.now()}.png')
 
 def run():
     options = webdriver.ChromeOptions()
@@ -37,23 +45,23 @@ def run():
     password_box.send_keys("kaixin1234")
     # sleep(1)
     # print(submit_button.text)
-    # submit_button.click()
+    submit_button.click()
     # submit_button.send_keys(Keys.ENTER)
     # driver.execute_script('arguments[0].click();', submit_button)
     # ActionChains(driver).send_keys(Keys.ENTER).perform()
 
-    # try:
-    #   title = WebDriverWait(driver, 5).until(
-    #       lambda d: d.find_element(By.CSS_SELECTOR, "#mumucms_username")
-    #   )
-    #   print(title.text)
-    # except:
-    #   print('error!')
-    # finally:
-    #   driver.save_screenshot('snapshot.png')
-    #   driver.quit()
-    input('type to exit')
-    driver.quit()
+    try:
+      title = WebDriverWait(driver, 5).until(
+          lambda d: d.find_element(By.CSS_SELECTOR, "#mumucms_username")
+      )
+      print(title.text)
+    except:
+      print('error!')
+    finally:
+      screenshot(driver)
+      driver.quit()
+    # input('type to exit')
+    # driver.quit()
 
 
 if __name__ == '__main__':
