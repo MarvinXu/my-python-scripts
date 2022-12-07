@@ -1,0 +1,14 @@
+import requests
+
+with requests.Session() as s:
+    
+    r0 = s.post('https://www.4ksj.com/member.php?mod=logging&action=login&loginsubmit=yes&inajax=1', data={
+      'username': 'marvinphone',
+      'password': 'kaixin1234'
+    })
+    r = s.get('https://www.4ksj.com/home.php?mod=space&do=doing&view=me')
+    print(r.text.split('\n')[:10])
+    
+    # 签到请求不生效
+    # r = s.get('https://www.4ksj.com//qiandao/?mod=sign&operation=qiandao&formhash=22fab891&format=empty&inajax=1&ajaxtarget=')
+    # print(r.text)

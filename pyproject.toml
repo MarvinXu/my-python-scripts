@@ -9,6 +9,7 @@ packages = [{include = "my_python_scripts"}]
 [tool.poetry.dependencies]
 python = "^3.8"
 selenium = "^4.7.2"
+requests = "^2.28.1"
 
 
 [build-system]
@@ -16,7 +17,7 @@ requires = ["poetry-core"]
 build-backend = "poetry.core.masonry.api"
 
 [tool.poetry.scripts]
-my-script = "my_python_scripts.main:main"
+start = "my_python_scripts.selenium:run"
 
 [[tool.poetry.source]]
 name = "tsinghua"
