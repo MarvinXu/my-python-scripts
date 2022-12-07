@@ -1,6 +1,5 @@
 import os
-from datetime import datetime
-from time import sleep
+from time import sleep, strftime
 
 from selenium import webdriver
 from selenium.webdriver import ActionChains
@@ -11,9 +10,10 @@ from selenium.webdriver.support.wait import WebDriverWait
 
 def screenshot(driver):
     path = 'downloads'
+    timeformat = '%Y_%m_%d-%I_%M_%S_%p'
     if not os.path.exists(path):
         os.makedirs(path)
-    driver.save_screenshot(f'{path}/{datetime.now()}.png')
+    driver.save_screenshot(f'{path}/{strftime(timeformat)}.png')
 
 def run():
     options = webdriver.ChromeOptions()
@@ -49,17 +49,18 @@ def run():
     # submit_button.send_keys(Keys.ENTER)
     # driver.execute_script('arguments[0].click();', submit_button)
     # ActionChains(driver).send_keys(Keys.ENTER).perform()
-
-    try:
-      title = WebDriverWait(driver, 5).until(
-          lambda d: d.find_element(By.CSS_SELECTOR, "#mumucms_username")
-      )
-      print(title.text)
-    except:
-      print('error!')
-    finally:
-      screenshot(driver)
-      driver.quit()
+    screenshot(driver)
+    driver.quit()
+    # try:
+    #   title = WebDriverWait(driver, 5).until(
+    #       lambda d: d.find_element(By.CSS_SELECTOR, "#mumucms_username")
+    #   )
+    #   print(title.text)
+    # except:
+    #   print('error!')
+    # finally:
+    #   screenshot(driver)
+    #   driver.quit()
     # input('type to exit')
     # driver.quit()
 
