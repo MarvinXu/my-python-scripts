@@ -57,4 +57,14 @@ jobs:
     #----------------------------------------------
     - name: Run scripts
       run: |
-        poetry run start
+        poetry run 4k
+    #----------------------------------------------
+    #              upload artifacts
+    #----------------------------------------------    
+    - name: Archive production artifacts
+      uses: actions/upload-artifact@v3
+      with:
+        name: dist-without-markdown
+        path: |
+          downloads
+          !downloads/**/*.md
