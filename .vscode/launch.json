@@ -9,7 +9,7 @@
       "type": "python",
       "request": "launch",
       "cwd": "${workspaceFolder}",
-      "module": "my_python_scripts",
+      "module": "my_python_scripts.4ksj_selenium",
       "justMyCode": false,
       "args": [
       ]

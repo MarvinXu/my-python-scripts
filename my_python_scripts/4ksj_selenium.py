@@ -1,69 +1,103 @@
+import json
 import os
-from time import sleep, strftime
+from time import sleep
 
+from dotenv import load_dotenv
+from loguru import logger
 from selenium import webdriver
-from selenium.webdriver import ActionChains
 from selenium.webdriver.common.by import By
-from selenium.webdriver.common.keys import Keys
+from selenium.webdriver.support.expected_conditions import visibility_of_element_located
 from selenium.webdriver.support.wait import WebDriverWait
 
+from .util import screenshot
 
-def screenshot(driver):
-    path = 'downloads'
-    timeformat = '%Y_%m_%d-%I_%M_%S_%p'
-    if not os.path.exists(path):
-        os.makedirs(path)
-    driver.save_screenshot(f'{path}/{strftime(timeformat)}.png')
 
-def run():
+def setup_driver():
     options = webdriver.ChromeOptions()
-    options.add_argument('--headless')
-    options.add_argument('--disable-gpu')
-    options.add_argument('-incognito')
-    options.add_argument('--remote-debugging-address=0.0.0.0')
-    options.add_argument('--remote-debugging-port=5333')
-    # options.add_argument("window-size=1920,1080")
+    options.add_argument("--headless")
+    options.add_argument("--disable-gpu")
+    options.add_argument("-incognito")
+    options.add_argument("--remote-debugging-address=0.0.0.0")
+    options.add_argument("--remote-debugging-port=5333")
+    options.add_argument(
+        "user-agent=Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/108.0.0.0 Safari/537.36"
+    )
+    options.add_argument("window-size=1280,720")
 
     driver = webdriver.Chrome(options=options)
 
-    driver.get("https://www.4ksj.com/member.php?mod=logging&action=login")
+    return driver
 
-    # try:
-    #   title = WebDriverWait(driver, 10).until(
-    #       lambda d: d.find_element(By.CSS_SELECTOR, "input[name=username]")
-    #   )
-    #   print(title.text)
-    # except:
-    #   driver.save_screenshot('snapshot.png')
-    #   driver.quit()
 
-    username_box = driver.find_element(by=By.CSS_SELECTOR, value="input[name=username]")
-    password_box = driver.find_element(by=By.CSS_SELECTOR, value="input[name=password]")
-    submit_button = driver.find_element(by=By.CSS_SELECTOR, value="button[name=loginsubmit]")
+def run():
+    load_dotenv()
+    accounts = json.loads(os.getenv("4K_ACCOUNTS") or "[]")
 
-    username_box.send_keys("272077995@qq.com")
-    password_box.send_keys("kaixin1234")
-    # sleep(1)
-    # print(submit_button.text)
-    submit_button.click()
-    # submit_button.send_keys(Keys.ENTER)
-    # driver.execute_script('arguments[0].click();', submit_button)
-    # ActionChains(driver).send_keys(Keys.ENTER).perform()
-    screenshot(driver)
+    for account in accounts:
+        task(account)
+
+
+# Sign in with account
+def task(account):
+    driver = setup_driver()
+
+    USERNAME = account["u"]
+    PASSWORD = account["p"]
+
+    # Login
+    try:
+        driver.get("https://www.4ksj.com/member.php?mod=logging&action=login")
+        username_box = driver.find_element(
+            by=By.CSS_SELECTOR, value="input[name=username]"
+        )
+        password_box = driver.find_element(
+            by=By.CSS_SELECTOR, value="input[name=password]"
+        )
+        submit_button = driver.find_element(
+            by=By.CSS_SELECTOR, value="button[name=loginsubmit]"
+        )
+        username_box.send_keys(USERNAME)
+        password_box.send_keys(PASSWORD)
+        submit_button.click()
+        logger.debug("Start Login...")
+
+        # wait for page redirect
+        profile = WebDriverWait(driver, 10).until(
+            visibility_of_element_located((By.CSS_SELECTOR, "#mumucms_username"))
+        )
+        logger.success(f"Login success: {profile.text}")
+    except:
+        screenshot(driver)
+        logger.error("Login failed!")
+        return driver.quit()
+
+    # Sign in
+    try:
+        driver.get("https://www.4ksj.com/qiandao/")
+        signbtn = WebDriverWait(driver, 5).until(
+            visibility_of_element_located((By.CSS_SELECTOR, "#JD_sign"))
+        )
+        signbtn.click()
+        sleep(2)
+        logger.success("Sign-in succeed!")
+    except:
+        logger.error("Sign-in failed!")
+        screenshot(driver)
+        return driver.quit()
+
+    # Get result
+    try:
+        driver.get("https://www.4ksj.com/home.php?mod=spacecp&ac=credit&op=base")
+        result = WebDriverWait(driver, 5).until(
+            visibility_of_element_located((By.CSS_SELECTOR, "table tr:nth-child(2)"))
+        )
+        logger.info(result.text)
+    except:
+        logger.error("Get result failed!")
+        screenshot(driver)
+
     driver.quit()
-    # try:
-    #   title = WebDriverWait(driver, 5).until(
-    #       lambda d: d.find_element(By.CSS_SELECTOR, "#mumucms_username")
-    #   )
-    #   print(title.text)
-    # except:
-    #   print('error!')
-    # finally:
-    #   screenshot(driver)
-    #   driver.quit()
-    # input('type to exit')
-    # driver.quit()
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     run()
