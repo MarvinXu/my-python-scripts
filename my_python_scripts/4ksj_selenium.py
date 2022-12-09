@@ -33,6 +33,9 @@ def run():
     load_dotenv()
     accounts = json.loads(os.getenv("4K_ACCOUNTS") or "[]")
 
+    if not accounts:
+        return logger.error("no accounts found, cancel task.")
+
     for account in accounts:
         task(account)
 
