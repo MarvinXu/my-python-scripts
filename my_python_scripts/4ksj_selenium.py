@@ -31,7 +31,7 @@ def setup_driver():
 
 def run():
     load_dotenv()
-    accounts = json.loads(os.getenv("4K_ACCOUNTS") or "[]")
+    accounts = json.loads(os.getenv("ACCOUNTS_4KSJ") or "[]")
 
     if not accounts:
         return logger.error("no accounts found, cancel task.")
