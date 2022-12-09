@@ -13,8 +13,9 @@ permissions:
 
 jobs:
   build:
-
     runs-on: ubuntu-latest
+    env:
+      ACCOUNTS_4KSJ: ${{ secrets.ACCOUNTS_4KSJ }}
 
     steps:
     #----------------------------------------------
