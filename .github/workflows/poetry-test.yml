@@ -32,6 +32,7 @@ jobs:
         # poetry config virtualenvs.in-project false
     - run: |
         echo $PATH
+        whereis poetry
         ls ~/.local/bin
         ls ~/.local/share/
     - run: poetry --version
