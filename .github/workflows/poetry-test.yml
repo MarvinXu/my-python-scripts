@@ -16,12 +16,23 @@ jobs:
 
     steps:
     - uses: actions/checkout@v3
-    
+    - name: Using Cached Poetry
+      id: cache-poetry
+      uses: actions/cache@v3
+      with:
+        path: |
+          ~/.local/share/pypoetry
+          ~/.local/bin/poetry
+          ~/.config/pypoetry
+    - name: Install Poetry
+      if: ${{steps.cache-poetry.outputs.cache-hit}} != 'true'
+      run: |
+        pipx install poetry
+        # poetry config virtualenvs.in-project false
+          
     - uses: actions/setup-python@v4
       with:
         python-version: '3.10'
         cache: 'poetry'
-    - name: Install poetry
-      run: pipx install poetry
     - run: poetry install
     - run: poetry run selenium  
