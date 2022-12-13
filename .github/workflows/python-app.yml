@@ -18,43 +18,34 @@ jobs:
       ACCOUNTS_4KSJ: ${{ secrets.ACCOUNTS_4KSJ }}
 
     steps:
-    #----------------------------------------------
-    #       check-out repo and set-up python
-    #----------------------------------------------
     - uses: actions/checkout@v3
-    - name: Set up Python 3.10
-      id: setup-python
-      uses: actions/setup-python@v4
-      with:
-        python-version: "3.10"
     #----------------------------------------------
-    #  -----  install & configure poetry  -----
+    #  -----  install & configure poetry ( before setup-python to handle dep cache )  -----
     #----------------------------------------------
-    - name: Load cached Poetry installation
-      id: cached-poetry
+    - name: Using Cached Poetry
+      id: cache-poetry
       uses: actions/cache@v3
       with:
-        path: ~/.local  # the path depends on the OS
-        key: poetry-0  # increment to reset cache
+        key: poetry-cache-0
+        path: |
+          ~/.local/share/pypoetry
+          ~/.local/bin/poetry
+          ~/.config/pypoetry
+          
     - name: Install Poetry
-      if: steps.cached-poetry.outputs.cache-hit != 'true'
-      uses: snok/install-poetry@v1
-    - run: |
+      if: ${{steps.cache-poetry.outputs.cache-hit != 'true'}} 
+      run: |
+        curl -sSL https://install.python-poetry.org | python3 -
         poetry config virtualenvs.in-project true
-    #----------------------------------------------
-    #       load cached venv if cache exists
-    #----------------------------------------------
-    - name: Load cached venv
-      id: cached-poetry-dependencies
-      uses: actions/cache@v3
+    
+    - uses: actions/setup-python@v4
+      id: setup-python
       with:
-        path: .venv
-        key: venv-${{ runner.os }}-${{ steps.setup-python.outputs.python-version }}-${{ hashFiles('**/poetry.lock') }}
-    #----------------------------------------------
-    # install dependencies if cache does not exist
-    #----------------------------------------------
-    - name: Install dependencies
-      if: steps.cached-poetry-dependencies.outputs.cache-hit != 'true'
+        python-version: '3.10'
+        cache: 'poetry'
+
+    - name: Install dep
+      if: ${{steps.setup-python.outputs.cache-hit != 'true'}}
       run: poetry install --no-interaction --no-root
     #----------------------------------------------
     #              run scripts
